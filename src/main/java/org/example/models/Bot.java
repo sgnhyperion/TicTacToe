@@ -1,10 +1,23 @@
 package org.example.models;
 
+import java.util.List;
+
 public class Bot extends Player{
-    public Bot(String name, Symbol symbol, PlayerType playerType, BotDifficultyLevel botDifficultyLevel) {
+    BotDifficultyLevel botDifficultyLevel;
+
+    public Bot(String name, Symbol symbol, PlayerType playerType) {
         super(name, symbol, playerType);
-        this.botDifficultyLevel = botDifficultyLevel;
+//        this.botDifficultyLevel = botDifficultyLevel;
     }
 
-    BotDifficultyLevel botDifficultyLevel;
+    public Move makeMove(Board board) {
+        for(List<Cell> row: board.getBoard()){
+            for(Cell cell: row){
+                if(cell.getCellState().equals(CellState.EMPTY)){
+                    return new Move(cell, this);
+                }
+            }
+        }
+        return null;
+    }
 }

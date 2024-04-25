@@ -1,5 +1,8 @@
 package org.example.models;
 
+import org.example.exceptions.InvalidMoveException;
+import org.example.strategies.WinningAlgorithm;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +13,7 @@ public class Game {
     private GameState gameState;
     private Player winner;
     private int nextPlayerMoveIndex;
+    private WinningAlgorithm winningAlgorithm;
 
     public Game(int dimension, List<Player> players){
         this.board = new Board(dimension);
@@ -18,6 +22,7 @@ public class Game {
         this.gameState = GameState.IN_PROGRESS;
         this.winner = null;
         this.nextPlayerMoveIndex = 0;
+        this.winningAlgorithm = new WinningAlgorithm();
     }
 
     public Board getBoard() {
@@ -73,7 +78,41 @@ public class Game {
         this.board.printBoard();
     }
 
-    public void makeMove(Game game){
+    public boolean ValidateMove(Move move){
+        int row = move.getCell().getRow();
+        int col = move.getCell().getCol();
 
+        if(row < 0 || row >= board.getSize() || col < 0 || col >= board.getSize()){
+            return false;
+        }
+        return board.getBoard().get(row).get(col).getCellState().equals(CellState.EMPTY);
+    }
+
+    public void makeMove() throws InvalidMoveException {
+        Player currentPlayer = players.get(nextPlayerMoveIndex);
+        Move move = currentPlayer.makeMove(board);
+
+        if(!ValidateMove(move)){
+            throw new InvalidMoveException("Invalid move made by "+ currentPlayer.getName());
+        }
+
+        int row = move.getCell().getRow();
+        int col = move.getCell().getCol();
+
+        Cell cellTochange = board.getBoard().get(row).get(col);
+        cellTochange.setPlayer(currentPlayer);
+        cellTochange.setCellState(CellState.FILLED);
+
+        Move finalMove = new Move(cellTochange, currentPlayer);
+        moves.add(finalMove);
+
+        nextPlayerMoveIndex = (nextPlayerMoveIndex+1)%players.size();
+
+        if(winningAlgorithm.checkWinner(board, finalMove)){
+            gameState = GameState.ENDED;
+            winner = currentPlayer;
+        }
+
+        return;
     }
 }

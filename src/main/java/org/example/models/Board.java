@@ -8,6 +8,7 @@ public class Board {
     private List<List<Cell>> board;
 
     public Board(int size){
+        this.size = size;
         board = new ArrayList<>();
 
         for(int i=0;i<size;i++){
@@ -25,7 +26,7 @@ public class Board {
                 if(cell.getCellState().equals(CellState.EMPTY)){
                     System.out.print(" | -- | ");
                 } else{
-                    System.out.println(" | "+ cell.getPlayer().getSymbol()+ " | ");
+                    System.out.print(" | "+ cell.getPlayer().getSymbol().getCharacter()+ " | ");
                 }
             }
             System.out.println();
